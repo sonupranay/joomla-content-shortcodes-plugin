@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="content" method="upgrade">
+    <name>PLG_CONTENT_CONTENTSHORTCODES</name>
+    <author>Pranay</author>
+    <creationDate>2024-12-19</creationDate>
+    <copyright>Copyright (C) 2024. All rights reserved.</copyright>
+    <license>GNU/GPL Version 2 or later - http://www.gnu.org/licenses/gpl-2.0.html</license>
+    <authorEmail>freefireusaofficial0@gmail.com</authorEmail>
+    <version>1.0.0</version>
+    <description>PLG_CONTENT_CONTENTSHORTCODES_XML_DESCRIPTION</description>
+    
+    <files>
+        <filename plugin="contentshortcodes">contentshortcodes.php</filename>
+        <filename>index.html</filename>
+        <folder>css</folder>
+        <folder>js</folder>
+        <folder>language</folder>
+    </files>
+    
+    <languages>
+        <language tag="en-GB">language/en-GB/plg_content_contentshortcodes.ini</language>
+        <language tag="en-GB">language/en-GB/plg_content_contentshortcodes.sys.ini</language>
+    </languages>
+    
+    <config>
+        <fields name="params">
+            <fieldset name="basic" label="PLG_CONTENT_CONTENTSHORTCODES_BASIC_SETTINGS">
+                <field
+                    name="enable_buttons"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_BUTTONS"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_BUTTONS_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_alerts"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_ALERTS"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_ALERTS_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_gallery"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_GALLERY"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_GALLERY_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_tabs"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_TABS"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_TABS_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_accordion"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_ACCORDION"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_ACCORDION_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_countdown"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_COUNTDOWN"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_COUNTDOWN_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                
+                <field
+                    name="enable_contact_form"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_CONTACT_FORM"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_ENABLE_CONTACT_FORM_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+            </fieldset>
+            
+            <fieldset name="styling" label="PLG_CONTENT_CONTENTSHORTCODES_STYLING_SETTINGS">
+                <field
+                    name="button_style"
+                    type="list"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_BUTTON_STYLE"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_BUTTON_STYLE_DESC"
+                    default="bootstrap"
+                >
+                    <option value="bootstrap">Bootstrap</option>
+                    <option value="custom">Custom</option>
+                </field>
+                
+                <field
+                    name="load_css"
+                    type="radio"
+                    label="PLG_CONTENT_CONTENTSHORTCODES_LOAD_CSS"
+                    description="PLG_CONTENT_CONTENTSHORTCODES_LOAD_CSS_DESC"
+                    default="1"
+                    class="btn-group btn-group-yesno"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+            </fieldset>
+        </fields>
+    </config>
+</extension>
