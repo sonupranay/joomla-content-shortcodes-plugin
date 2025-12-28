@@ -16,7 +16,7 @@ A powerful Joomla content plugin that adds shortcode functionality to your artic
 
 ## 📦 Installation
 
-1. Download the latest release from [Releases](https://github.com/[YOUR_USERNAME]/joomla-content-shortcodes-plugin/releases)
+1. Download the latest release from [Releases](https://github.com/sonupranay/joomla-content-shortcodes-plugin/releases)
 2. Install via Joomla Admin → Extensions → Manage → Install
 3. Enable the plugin in Extensions → Plugins → Content - Content Shortcodes
 4. Configure settings as needed
@@ -110,7 +110,7 @@ This plugin includes comprehensive security measures:
 
 ## 🤝 Support
 
-- **Issues:** [GitHub Issues](https://github.com/[YOUR_USERNAME]/joomla-content-shortcodes-plugin/issues)
+- **Issues:** [GitHub Issues](https://github.com/sonupranay/joomla-content-shortcodes-plugin/issues)
 - **Email:** freefireusaofficial0@gmail.com
 
 ## 📄 License
